@@ -1,0 +1,13 @@
+"use strict";
+const express = require("express");
+const userRouter = require("./routes/user");
+const surveyRouter = require("./routes/survey");
+const router = express.Router();
+const app = express();
+const cors = require('cors');
+router.use("/user", userRouter);
+router.use("/survey", surveyRouter);
+app.use(cors());
+app.use(express.json());
+app.listen(3000);
+module.exports = router;
