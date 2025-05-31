@@ -93,7 +93,7 @@ router.get('/surveys/:id', async(req: Request, res: Response) => {
         });
 
         if (!survey) {
-            return res.status(404).json({ message: 'Survey not found' });
+             res.status(404).json({ message: 'Survey not found' });
         }
 
         res.json({ survey });
@@ -116,11 +116,11 @@ router.put('/surveys/:id', async (req: Request, res: Response) => {
         });
 
         if (!existingSurvey) {
-            return res.status(404).json({ message: 'Survey not found' });
+            res.status(404).json({ message: 'Survey not found' });
         }
 
         if (existingSurvey.userId !== userId) {
-            return res.status(403).json({ message: 'Not authorized to update this survey' });
+            res.status(403).json({ message: 'Not authorized to update this survey' });
         }
 
         const updatedSurvey = await prisma.survey.update({
@@ -170,11 +170,11 @@ router.delete('/surveys/:id', async (req: Request, res: Response) => {
         });
 
         if (!existingSurvey) {
-            return res.status(404).json({ message: 'Survey not found' });
+           res.status(404).json({ message: 'Survey not found' });
         }
 
         if (existingSurvey.userId !== userId) {
-            return res.status(403).json({ message: 'Not authorized to delete this survey' });
+            res.status(403).json({ message: 'Not authorized to delete this survey' });
         }
 
         await prisma.survey.delete({

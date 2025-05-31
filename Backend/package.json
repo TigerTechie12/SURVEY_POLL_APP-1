@@ -15,6 +15,7 @@
   "dependencies": {
     "@prisma/client": "^6.8.2",
     "@shreyash_iitr/common": "file:../Common",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
@@ -22,6 +23,7 @@
     "zod": "^3.25.20"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.9",

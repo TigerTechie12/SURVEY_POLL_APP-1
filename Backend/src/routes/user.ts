@@ -17,13 +17,15 @@ const signinInput = z.object({
     email: z.string().email(),
     password: z.string().min(8)
 });
+type SignupRequestBody = z.infer<typeof signupInput>;
+type SigninRequestBody = z.infer<typeof signinInput>;
 
-router.post('/signup', async (req: Request, res: Response) => {
+router.post('/signup', async (req: Request<{}, {}, SignupRequestBody>, res: Response) => {
     const { email, password, name } = req.body;
     
     const result = signupInput.safeParse({ email, password, name });
     if (!result.success) {
-        return res.status(400).json({ message: "Invalid input", errors: result.error.errors });
+        res.status(400).json({ message: "Invalid input", errors: result.error.errors });
     }
 
     try {
@@ -32,7 +34,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         });
 
         if (existingUser) {
-            return res.status(409).json({ message: "User already exists" });
+            res.status(409).json({ message: "User already exists" });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -56,16 +58,16 @@ router.post('/signup', async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error('Signup error:', error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 });
 
-router.post('/signin', async (req: Request, res: Response) => {
+router.post('/signin', async (req: Request<{}, {}, SigninRequestBody>, res: Response) => {
     const { email, password } = req.body;
     
     const result = signinInput.safeParse({ email, password });
     if (!result.success) {
-        return res.status(400).json({ message: "Invalid input", errors: result.error.errors });
+        res.status(400).json({ message: "Invalid input", errors: result.error.errors });
     }
 
     try {
@@ -74,16 +76,16 @@ router.post('/signin', async (req: Request, res: Response) => {
         });
 
         if (!user) {
-            return res.status(401).json({ message: "Invalid credentials" });
+            res.status(401).json({ message: "Invalid credentials" });
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
         if (!validPassword) {
-            return res.status(401).json({ message: "Invalid credentials" });
+           res.status(401).json({ message: "Invalid credentials" });
         }
 
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || 'your-secret-key');
-        return res.status(200).json({ 
+       res.status(200).json({ 
             message: "Login successful",
             token,
             user: {
@@ -94,7 +96,7 @@ router.post('/signin', async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error('Signin error:', error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 });
 
