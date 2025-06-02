@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { BACKEND_URL } from '../config';
+import { BACKEND_URL } from '@/config';
 
 interface Survey {
     title: string;
@@ -44,7 +44,11 @@ export function Card4() {
     const { loading, recentSurveys } = useRecentSurveys();
 
     if (loading) {
-        return <div className="text-gray-500">Loading Surveys...</div>;
+        return (
+            <div className="text-gray-500">
+                Loading Surveys...
+            </div>
+        );
     }
 
     return (
@@ -54,8 +58,12 @@ export function Card4() {
                     className="p-4 border rounded-lg shadow-sm hover:shadow-md transition" 
                     key={survey.id}
                 >
-                    <h3 className="text-lg font-bold">{survey.title}</h3>
-                    <p className="text-sm text-gray-600">{survey.description}</p>
+                    <h3 className="text-lg font-bold">
+                        {survey.title}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                        {survey.description}
+                    </p>
                     <p className="text-xs text-gray-400 mt-1">
                         Created at: {new Date(survey.createdAt).toLocaleString()}
                     </p>

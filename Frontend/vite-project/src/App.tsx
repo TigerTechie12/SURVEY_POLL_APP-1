@@ -5,6 +5,7 @@ import './App.css'
 import {Auth} from "./pages/auth"
 import {Dashboard} from "./pages/dashboard"
 import {RenderAllSurveys} from "./pages/fetchAllSurveys"
+import {CreateSurveys} from "./pages/createSurveys"
 import{BrowserRouter,Route,Routes} from 'react-router-dom'
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
         <Route path='/signin' element={<Auth type='signin'></Auth>}></Route>
         <Route path='/' element={<Dashboard></Dashboard>}></Route>    
         <Route path='/surveys/bulk' element={<RenderAllSurveys></RenderAllSurveys>}></Route>
+        <Route path='/surveys/create' element={<CreateSurveys></CreateSurveys>}></Route>
       </Routes>
       </BrowserRouter>
     </>
