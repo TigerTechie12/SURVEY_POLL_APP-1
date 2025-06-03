@@ -18,17 +18,20 @@ export function CreateSurveys() {
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
- function DeleteQuestions(questionIndex:number){
-    const del=[...questions]
-    setQuestions(del.splice(1,questionIndex))
- }
+    function DeleteQuestions(questionIndex: number) {
+        setQuestions(prev => prev.filter((_, index) => index !== questionIndex));
+    }
 
-   function DeleteOptions(questionIndex:number,optIndex:number){
-const del=[...questions]
-const delOpts=del[questionIndex].options.splice(1,optIndex)
-return delOpts;
-} 
-
+    function DeleteOptions(questionIndex: number, optIndex: number) {
+        setQuestions(prev => {
+            const updated = [...prev];
+            updated[questionIndex] = {
+                ...updated[questionIndex],
+                options: updated[questionIndex].options.filter((_, index) => index !== optIndex)
+            };
+            return updated;
+        });
+    }
 
     function AddQuestions() {
         setQuestions(prev => [...prev, { questionText: '', options: [''] }]);
@@ -114,19 +117,18 @@ return delOpts;
             <div className="space-y-6">
                 {questions.map((q, questionIndex) => (
                     <div key={questionIndex} className="border p-4 rounded">
-                        <div className="font-semibold mb-2">Question {questionIndex + 1}</div>
+                        <div className="flex flex-row justify-between items-center mb-2">
+                            <div className="font-semibold">Question {questionIndex + 1}</div>
+                            <button 
+                                onClick={() => DeleteQuestions(questionIndex)}
+                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                            >
+                                Delete Question
+                            </button>
+                        </div>
                         <div className="mb-2">
-                           
-                     <div className="flex flex-row justify-between">      <div className="font-semibold mb-1">Question Text *</div>
-                             <button  
-                onClick={()=>DeleteQuestions(questionIndex)}
-                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 "
-            >
-                Delete
-            </button>  </div> 
-
-
-                             <input 
+                            <div className="font-semibold mb-1">Question Text *</div>
+                            <input 
                                 type="text" 
                                 value={q.questionText}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,13 +149,11 @@ return delOpts;
                                 <span className="text-lg font-bold">＋</span>
                                 <span className="font-semibold">Add Option</span>
                             </button>
-         
-
                         </div>
 
                         <div className="space-y-2">
                             {q.options.map((opt, optIndex) => (
-                                <div key={optIndex}>
+                                <div key={optIndex} className="flex gap-2 items-center">
                                     <input 
                                         type="text" 
                                         value={opt}
@@ -161,15 +161,15 @@ return delOpts;
                                             const updated = [...questions];
                                             updated[questionIndex].options[optIndex] = e.target.value;
                                             setQuestions(updated);
-                                                   }}
-                                        className="w-full p-2 border rounded"
+                                        }}
+                                        className="flex-1 p-2 border rounded"
                                     />
-                                    <button  
-                onClick={()=>DeleteOptions(questionIndex,optIndex)}
-                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 "
-            >
-                Delete
-            </button> 
+                                    <button 
+                                        onClick={() => DeleteOptions(questionIndex, optIndex)}
+                                        className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
                             ))}
                         </div>
