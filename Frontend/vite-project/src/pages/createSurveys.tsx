@@ -18,6 +18,18 @@ export function CreateSurveys() {
     const [description, setDescription] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+ function DeleteQuestions(questionIndex:number){
+    const del=[...questions]
+    setQuestions(del.splice(1,questionIndex))
+ }
+
+   function DeleteOptions(questionIndex:number,optIndex:number){
+const del=[...questions]
+const delOpts=del[questionIndex].options.splice(1,optIndex)
+return delOpts;
+} 
+
+
     function AddQuestions() {
         setQuestions(prev => [...prev, { questionText: '', options: [''] }]);
     }
@@ -30,11 +42,39 @@ export function CreateSurveys() {
         });
     }
 
-async function submitResponse(){
-try{
-    const res=await axios.post(`/{BACKEND_URL},{title,description}`)
-}catch(e){}
-}
+    async function submitResponse() {
+        console.log('Button clicked, current isSubmitting:', isSubmitting);
+        try {
+            console.log('Setting isSubmitting to true');
+            setIsSubmitting(true);
+            console.log('After setting isSubmitting to true:', isSubmitting);
+            
+            const res = await axios.post(
+                `${BACKEND_URL}/survey`,
+                {
+                    title,
+                    description,
+                    questions: questions.map(q => ({
+                        title: q.questionText,
+                        options: q.options
+                    }))
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                }
+            );
+            
+            console.log("Survey submitted successfully:", res.data);
+        } catch (error) {
+            console.error("Error submitting survey:", error);
+        } finally {
+            console.log('Setting isSubmitting to false');
+            setIsSubmitting(false);
+            console.log('After setting isSubmitting to false:', isSubmitting);
+        }
+    }
 
     return (<div> 
         <div className="flex flex-row justify-between">
@@ -46,6 +86,8 @@ try{
                 Add Question
             </button>
         </div>
+          
+
         <div className="flex flex-col gap-4 p-4">
             <div>
                 <div className="font-semibold mb-2">Survey Title *</div>
@@ -74,8 +116,17 @@ try{
                     <div key={questionIndex} className="border p-4 rounded">
                         <div className="font-semibold mb-2">Question {questionIndex + 1}</div>
                         <div className="mb-2">
-                            <div className="font-semibold mb-1">Question Text *</div>
-                            <input 
+                           
+                     <div className="flex flex-row justify-between">      <div className="font-semibold mb-1">Question Text *</div>
+                             <button  
+                onClick={()=>DeleteQuestions(questionIndex)}
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 "
+            >
+                Delete
+            </button>  </div> 
+
+
+                             <input 
                                 type="text" 
                                 value={q.questionText}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +147,8 @@ try{
                                 <span className="text-lg font-bold">＋</span>
                                 <span className="font-semibold">Add Option</span>
                             </button>
+         
+
                         </div>
 
                         <div className="space-y-2">
@@ -108,9 +161,15 @@ try{
                                             const updated = [...questions];
                                             updated[questionIndex].options[optIndex] = e.target.value;
                                             setQuestions(updated);
-                                        }}
+                                                   }}
                                         className="w-full p-2 border rounded"
                                     />
+                                    <button  
+                onClick={()=>DeleteOptions(questionIndex,optIndex)}
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 "
+            >
+                Delete
+            </button> 
                                 </div>
                             ))}
                         </div>
@@ -122,11 +181,15 @@ try{
         </div>
           <button 
                 onClick={submitResponse}
-               
-                className="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-green-300"
+                disabled={isSubmitting}
+                className={`flex items-center gap-2 px-4 py-2 rounded ${
+                    isSubmitting 
+                        ? 'bg-green-300 cursor-not-allowed' 
+                        : 'bg-green-500 hover:bg-green-600'
+                } text-white`}
             >
                 <span className="font-semibold">
-                    {isSubmitting ? 'Submitting...' : 'Submit'}
+                    {isSubmitting ? 'Submitting...' : 'Submit Survey'}
                 </span>
             </button>
         </div>
