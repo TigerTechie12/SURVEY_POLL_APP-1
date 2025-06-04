@@ -1,4 +1,6 @@
+import { useNavigate } from "react-router-dom"
 export function Card1(){
+    const navigate=useNavigate()
     return <div className="flex flex-row border-t-0 border-2 mt-4 border-gray-300">
     
         <div>
@@ -8,7 +10,7 @@ export function Card1(){
    </div>
    
    <div className="mt-5 ml-85">
-   <button className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800">
+   <button onClick={()=>{navigate('/surveys/create')}} className="flex items-center gap-2 bg-black text-white px-4 py-2 rounded-2xl hover:bg-gray-800">
    <span className="text-lg font-bold">＋</span>
       <span className="font-semibold">Create Survey</span>
     </button>

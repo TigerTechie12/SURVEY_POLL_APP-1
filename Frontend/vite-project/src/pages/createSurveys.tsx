@@ -1,6 +1,7 @@
 import { BACKEND_URL } from "../config/index";
 import { useState, useEffect } from "react";
 import axios from 'axios';
+import {useNavigate} from 'react-router-dom'
 
 type Option = string;
 
@@ -23,14 +24,17 @@ export function CreateSurveys() {
     }
 
     function DeleteOptions(questionIndex: number, optIndex: number) {
-        setQuestions(prev => {
-            const updated = [...prev];
-            updated[questionIndex] = {
-                ...updated[questionIndex],
-                options: updated[questionIndex].options.filter((_, index) => index !== optIndex)
-            };
-            return updated;
-        });
+    const copy=[...questions]
+    const final=copy[questionIndex].options[optIndex]
+    const f=copy[questionIndex].options  //this will still point to the options array of in-memory array i.e. questions array
+    const fagain=f.filter((_,index)=>index !=optIndex)
+   
+    copy[questionIndex]={
+        ...copy[questionIndex],
+        options:fagain
+    }
+setQuestions(copy)
+
     }
 
     function AddQuestions() {
