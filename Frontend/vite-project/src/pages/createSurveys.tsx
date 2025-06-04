@@ -16,7 +16,7 @@ export function CreateSurveys() {
         options: ["", ""]
     }]);
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     function DeleteQuestions(questionIndex: number) {
@@ -60,7 +60,7 @@ setQuestions(copy)
                 `${BACKEND_URL}/survey`,
                 {
                     title,
-                    description,
+                    
                     questions: questions.map(q => ({
                         title: q.questionText,
                         options: q.options
@@ -107,16 +107,7 @@ setQuestions(copy)
                 />
             </div>
 
-            <div>
-                <div className="font-semibold mb-2">Survey Description *</div>
-                <input 
-                    type="text" 
-                    placeholder="Briefly describe what this survey is about and why you are conducting it" 
-                    value={description}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
-                    className="w-full p-2 border rounded"
-                />
-            </div>
+         
 
             <div className="space-y-6">
                 {questions.map((q, questionIndex) => (

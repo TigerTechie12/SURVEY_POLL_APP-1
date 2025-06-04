@@ -1,10 +1,11 @@
 import { BACKEND_URL } from "../config/index";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 interface Survey {
     title: string;
-    description: string;
+
     responses: number;
     date: number;
     id: string;
@@ -15,7 +16,7 @@ export function RenderAllSurveys() {
     const [surveys, setSurveys] = useState<Survey[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+const navigate=useNavigate()
     useEffect(() => {
         async function fetchSurveys() {
             try {
@@ -24,8 +25,10 @@ export function RenderAllSurveys() {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
+                console.log('API Response:', res.data); 
                 const result = res.data.surveys;
-                setSurveys(result);
+               
+                setSurveys(result as Survey[]);
             } catch (err) {
                 console.error('Error fetching surveys:', err);
                 setError('Failed to load surveys');
@@ -71,7 +74,7 @@ export function RenderAllSurveys() {
             <h1 className="text-2xl font-bold mb-4">All Surveys</h1>
             <div className="space-y-4">
                 {surveys.map((survey) => (
-                    <div 
+                    <div onClick={()=>{navigate('/surveys/:id')}}
                         key={survey.id} 
                         className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
                     >
@@ -84,7 +87,7 @@ export function RenderAllSurveys() {
                                 Delete
                             </button>
                         </div>
-                        <p className="text-gray-600 mb-2">{survey.description}</p>
+                      
                         <div className="grid grid-cols-2 gap-2 text-sm text-gray-500">
                             <div>Created: {new Date(survey.createdAt).toLocaleDateString()}</div>
                             <div>Responses: {survey.responses}</div>

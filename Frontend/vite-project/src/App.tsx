@@ -6,6 +6,7 @@ import {Auth} from "./pages/auth"
 import {Dashboard} from "./pages/dashboard"
 import {RenderAllSurveys} from "./pages/fetchAllSurveys"
 import {CreateSurveys} from "./pages/createSurveys"
+import {RenderSurvey} from "./pages/fetchById"
 import{BrowserRouter,Route,Routes} from 'react-router-dom'
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path='/' element={<Dashboard></Dashboard>}></Route>    
         <Route path='/surveys/bulk' element={<RenderAllSurveys></RenderAllSurveys>}></Route>
         <Route path='/surveys/create' element={<CreateSurveys></CreateSurveys>}></Route>
+        <Route path='/surveys/:id' element={<RenderSurvey></RenderSurvey>}></Route>
       </Routes>
       </BrowserRouter>
     </>
