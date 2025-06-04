@@ -26,6 +26,9 @@ export function RenderSurvey() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const [questionEdit,setQuestionEdit]=useState<string>('')
+    const [optionEdit,setOptionEdit]=useState<string>('')
+
     useEffect(() => {
         async function fetchSurvey() {
             if (!surveyId) {
@@ -84,9 +87,45 @@ export function RenderSurvey() {
             <div>{survey.questions.map((q)=>(
                 <div key={q.id}>
                   <div>{q.title}</div>
+                  <input type="text" placeholder="Edit Question" onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setQuestionEdit(e.target.value)}} />
+                   <button 
+                                onClick={() => {async()=>{
+                                    const res=await axios.put(`${BACKEND_URL}/survey/${surveyId}/question/${q.id}`,{
+                                        questionEdit
+                                    },{
+                                         headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                                    })
+                                console.log("Question updated",res.data)
+                                }} }
+                                className="flex items-center gap-2 bg-slate-500 text-black px-4 py-2 rounded hover:bg-slate-600"
+                            >
+                               
+                                <span className="font-semibold">Edit</span>
+                            </button>
                   {q.options.map((o)=>(
                     <div key={o.id}>
                         <div className="flex flex-col">{o.text}</div>
+  <input type="text" placeholder="Edit Option" onChange={(e:React.ChangeEvent<HTMLInputElement>)=>{setOptionEdit(e.target.value)}} />
+                   <button 
+                                onClick={() => {async()=>{
+                                    const res=await axios.put(`${BACKEND_URL}/survey/${surveyId}/question/${q.id}/option/${o.id}`,{
+                                        optionEdit
+                                    },{
+                                         headers: {
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
+                    }
+                                    })
+                                console.log("Option updated",res.data)
+                                }} }
+                                className="flex items-center gap-2 bg-slate-500 text-black px-4 py-2 rounded hover:bg-slate-600"
+                            >
+                               
+                                <span className="font-semibold">Edit</span>
+                            </button>
+
+                          
                     </div>
                   ))}
 

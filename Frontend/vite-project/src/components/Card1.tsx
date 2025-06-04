@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 export function Card1(){
     const navigate=useNavigate()
-    return <div className="flex flex-row border-t-0 border-2 mt-4 border-gray-300">
+    return <div className="flex flex-row border-t-0 border-2 mt-4 justify-between border-gray-300">
     
         <div>
         <div className="font-bold text-4xl">Survey App</div>
@@ -16,6 +16,6 @@ export function Card1(){
     </button>
 </div>
 
-        <div></div>
+       
     </div>
 }
