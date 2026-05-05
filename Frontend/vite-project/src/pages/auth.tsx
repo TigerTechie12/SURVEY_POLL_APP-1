@@ -1,33 +1,103 @@
-import {Link, useNavigate} from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { BACKEND_URL } from '../config/index'
 
-export function Auth({type}:{type: "signup" | "signin"}){
-const navigate=useNavigate()
+export function Auth({ type }: { type: "signup" | "signin" }) {
+  const navigate = useNavigate()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-return <div>
-        <div className=" flex justify-center font-bold text-lg">Survey App</div>
-        <div className="space-y-4">
-        <div className="flex flex-col justify-center mt-4 items-center">
+  async function handleSubmit() {
+    setError('')
+    setLoading(true)
+    try {
+      const endpoint = type === 'signup' ? '/user/signup' : '/user/signin'
+      const body = type === 'signup' ? { name, email, password } : { email, password }
+      const res = await axios.post(`${BACKEND_URL}${endpoint}`, body)
+      localStorage.setItem('token', res.data.token)
+      navigate('/')
+    } catch (e: any) {
+      setError(e?.response?.data?.message || 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-            <div className="font-semibold text-left">{type=='signup'?"Name" : null }</div>
-          {type=="signup"?<input type='text' className="w-1/2 flex justify-center align-middle pt-1 pb-1 items-center border-gray-400 rounded-xl border-2" placeholder=" John"></input>:null} </div>
-            
-             <div className="flex flex-col items-center">
-             <div className="font-semibold flex items-start">Email</div>
-             <input type="text" placeholder=" xyz@protonmail.com" className="w-1/2 flex justify-center pt-1 pb-1  border-gray-400 rounded-xl border-2" /></div>       
-            
-             <div className="flex flex-col items-center">
-                
-             <div className="font-semibold">Password</div>
-             <input type="text" placeholder=" *********" className="w-1/2 flex justify-center pt-1 pb-1  border-gray-400 rounded-xl border-2" /></div>
-            
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-indigo-600">SurveyApp</h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            {type === 'signin' ? 'Welcome back' : 'Create your account'}
+          </p>
+        </div>
 
-            <div className="flex flex-row justify-center">
-            <button onClick={()=>{navigate('/')}} className=" bg-gradient-to-r from-green-400 via-green-500 to-green-600 w-10xl ml-55 rounded-xl pl-4 pr-4 pt-1 pb-1 text-white hover:bg-gradient-to-br focus:ring-green-300 dark:focus:ring-green-800">
-      {type=='signin'?'Signin':'Signup'}
-      </button>
-      <div className='ml-1 mt-1 text-sm text-gray-400'>{type=="signup"?'Have an account already?':"Don't have an account?"}</div> <Link className='text-sm mt-1 ml-1 underline' to={type=='signup' ? "/signin" : '/signup'}>{type=='signup'?'Signin':'Signup'}</Link>  
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 space-y-5">
+          {type === 'signup' && (
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                placeholder="John Doe"
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              placeholder="xyz@example.com"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg border border-red-200">
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold py-2.5 rounded-lg transition-colors"
+          >
+            {loading ? 'Please wait...' : type === 'signin' ? 'Sign In' : 'Create Account'}
+          </button>
+
+          <p className="text-center text-sm text-gray-500">
+            {type === 'signup' ? 'Already have an account? ' : "Don't have an account? "}
+            <Link
+              to={type === 'signup' ? '/signin' : '/signup'}
+              className="text-indigo-600 font-medium hover:underline"
+            >
+              {type === 'signup' ? 'Sign In' : 'Sign Up'}
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
-
-</div>
+  )
 }

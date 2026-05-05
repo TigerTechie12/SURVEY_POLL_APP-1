@@ -1,17 +1,33 @@
-import {useNavigate} from 'react-router-dom'
-export function Card2(){
-    const navigate=useNavigate()
-    return <div className="border-gray-300 border-b-2">
-        <div className="mt-4 ml-1  text-2xl mb-3 font-semibold">Welcome to the Survey App</div>
-        <div className="ml-1">Create your own surveys or participate in exisiting ones</div>
-        <div className="mb-4 mt-6 ml-1">This application allows you to:
-    Create surveys with multiple questions and options
-    Vote in surveys created by others
-    View detailed results of surveys
-    Manage your own surveys</div>
-    <button onClick={()=>{navigate('/surveys/bulk')}} className="flex items-center gap-2 bg-black mb-4 ml-1 text-white px-4 py-2 rounded mt-4 hover:bg-gray-800">
-    
-      <span className="font-semibold">Get Started</span>
-    </button>
+import { useNavigate } from 'react-router-dom'
+
+export function Card2() {
+  const navigate = useNavigate()
+
+  const features = [
+    'Create surveys with multiple questions and options',
+    'Vote in surveys created by others',
+    'View detailed results of surveys',
+    'Manage your own surveys',
+  ]
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+      <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to SurveyApp</h2>
+      <p className="text-gray-500 text-sm mb-6">Create your own surveys or participate in existing ones.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        {features.map(feature => (
+          <div key={feature} className="flex items-start gap-2 text-sm text-gray-600">
+            <span className="text-indigo-500 mt-0.5 shrink-0">✓</span>
+            {feature}
+          </div>
+        ))}
+      </div>
+      <button
+        onClick={() => navigate('/surveys/bulk')}
+        className="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
+      >
+        Browse Surveys
+      </button>
     </div>
+  )
 }
