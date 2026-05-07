@@ -21,7 +21,7 @@ interface Survey {
 
 export function RenderSurvey() {
   const [survey, setSurvey] = useState<Survey | null>(null)
-  const { surveyId } = useParams<{ surveyId: string }>()
+  const { id: surveyId } = useParams<{ id: string }>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
