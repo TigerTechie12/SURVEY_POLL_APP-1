@@ -1,5 +1,5 @@
 import { BACKEND_URL } from "../config/index"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useState, useEffect } from "react"
 import axios from 'axios'
 
@@ -24,6 +24,7 @@ export function RenderSurvey() {
   const { surveyId } = useParams<{ surveyId: string }>()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
   const [questionEdit, setQuestionEdit] = useState<string>('')
   const [optionEdit, setOptionEdit] = useState<string>('')
 
@@ -78,6 +79,12 @@ export function RenderSurvey() {
     <div className="min-h-screen bg-slate-50">
       <div className="max-w-3xl mx-auto px-6 py-10">
         <div className="mb-8">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm mb-3"
+          >
+            ← Back to Dashboard
+          </button>
           <h1 className="text-2xl font-bold text-gray-900">{survey.title}</h1>
           <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
             <span>Created {new Date(survey.createdAt).toLocaleDateString()}</span>
