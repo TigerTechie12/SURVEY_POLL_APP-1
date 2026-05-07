@@ -1,11 +1,11 @@
-import { Request, Response, Router } from 'express';
-import { PrismaClient } from '../../generated/prisma';
-import { Verify } from '../middleware/m';
+import { Request, Response, Router } from 'express'
+import { PrismaClient } from '../../generated/prisma'
+import { Verify } from '../middleware/m'
 
-const prisma = new PrismaClient();
-const router = Router();
+const prisma = new PrismaClient()
+const router = Router()
 
-router.use(Verify);
+router.use(Verify)
 
 router.get('/surveys', async (req: Request, res: Response) => {
     try {
@@ -24,24 +24,24 @@ router.get('/surveys', async (req: Request, res: Response) => {
                     }
                 }
             }
-        });
-        res.json({ surveys });
+        })
+        res.json({ surveys })
     } catch (error) {
-        console.error('Error fetching surveys:', error);
-        res.status(500).json({ message: 'Failed to fetch surveys' });
+        console.error('Error fetching surveys:', error)
+        res.status(500).json({ message: 'Failed to fetch surveys' })
     }
-});
+})
 
-// Create a new survey
 router.post('/surveys', async (req: Request, res: Response) => {
-    const { title, questions } = req.body;
-    const userId = (req as any).user.userId; // Get userId from JWT token
+    const { title, questions } = req.body
+    const userId = (req as any).user.userId
 
     try {
         const survey = await prisma.survey.create({
             data: {
                 title,
                 userId,
+                createdAt: new Date().toISOString(),
                 questions: {
                     create: questions.map((q: any) => ({
                         title: q.title,
@@ -60,17 +60,16 @@ router.post('/surveys', async (req: Request, res: Response) => {
                     }
                 }
             }
-        });
-        res.status(201).json({ message: 'Survey created successfully', survey });
+        })
+        res.status(201).json({ message: 'Survey created successfully', survey })
     } catch (error) {
-        console.error('Error creating survey:', error);
-        res.status(500).json({ message: 'Failed to create survey' });
+        console.error('Error creating survey:', error)
+        res.status(500).json({ message: 'Failed to create survey' })
     }
-});
+})
 
-// Get a survey by ID
-router.get('/surveys/:id', async(req: Request, res: Response) => {
-    const surveyId = parseInt(req.params.id);
+router.get('/surveys/:id', async (req: Request, res: Response) => {
+    const surveyId = parseInt(req.params.id as string)
     try {
         const survey = await prisma.survey.findUnique({
             where: { id: surveyId },
@@ -88,45 +87,38 @@ router.get('/surveys/:id', async(req: Request, res: Response) => {
                     }
                 }
             }
-        });
+        })
 
         if (!survey) {
-<<<<<<< HEAD:Backend/src/routes/survey.ts
-             res.status(404).json({ message: 'Survey not found' });
-=======
-            res.status(404).json({ message: 'Survey not found' });
->>>>>>> 152559ad1a17d89b54484bdd3a76be7e3adb83c7:src/routes/survey.ts
+            res.status(404).json({ message: 'Survey not found' })
+            return
         }
 
-        res.json({ survey });
+        res.json({ survey })
     } catch (error) {
-        console.error('Error fetching survey:', error);
-        res.status(500).json({ message: 'Failed to fetch survey' });
+        console.error('Error fetching survey:', error)
+        res.status(500).json({ message: 'Failed to fetch survey' })
     }
-});
+})
 
-// Update a survey by ID
 router.put('/surveys/:id', async (req: Request, res: Response) => {
-    const surveyId = parseInt(req.params.id);
-    const { title, questions } = req.body;
-    const userId = (req as any).user.userId;
+    const surveyId = parseInt(req.params.id as string)
+    const { title, questions } = req.body
+    const userId = (req as any).user.userId
 
     try {
-        // First check if survey exists and belongs to user
         const existingSurvey = await prisma.survey.findUnique({
             where: { id: surveyId }
-        });
+        })
 
         if (!existingSurvey) {
-            res.status(404).json({ message: 'Survey not found' });
+            res.status(404).json({ message: 'Survey not found' })
+            return
         }
 
-<<<<<<< HEAD:Backend/src/routes/survey.ts
-        if (existingSurvey.userId !== userId) {
-=======
         if (existingSurvey?.userId !== userId) {
->>>>>>> 152559ad1a17d89b54484bdd3a76be7e3adb83c7:src/routes/survey.ts
-            res.status(403).json({ message: 'Not authorized to update this survey' });
+            res.status(403).json({ message: 'Not authorized to update this survey' })
+            return
         }
 
         const updatedSurvey = await prisma.survey.update({
@@ -155,50 +147,43 @@ router.put('/surveys/:id', async (req: Request, res: Response) => {
                     }
                 }
             }
-        });
+        })
 
-        res.json({ message: 'Survey updated successfully', survey: updatedSurvey });
+        res.json({ message: 'Survey updated successfully', survey: updatedSurvey })
     } catch (error) {
-        console.error('Error updating survey:', error);
-        res.status(500).json({ message: 'Failed to update survey' });
+        console.error('Error updating survey:', error)
+        res.status(500).json({ message: 'Failed to update survey' })
     }
-});
+})
 
-// Delete a survey by ID
 router.delete('/surveys/:id', async (req: Request, res: Response) => {
-    const surveyId = parseInt(req.params.id);
-    const userId = (req as any).user.userId;
+    const surveyId = parseInt(req.params.id as string)
+    const userId = (req as any).user.userId
 
     try {
-        // First check if survey exists and belongs to user
         const existingSurvey = await prisma.survey.findUnique({
             where: { id: surveyId }
-        });
+        })
 
         if (!existingSurvey) {
-<<<<<<< HEAD:Backend/src/routes/survey.ts
-           res.status(404).json({ message: 'Survey not found' });
-        }
-
-        if (existingSurvey.userId !== userId) {
-=======
-            res.status(404).json({ message: 'Survey not found' });
+            res.status(404).json({ message: 'Survey not found' })
+            return
         }
 
         if (existingSurvey?.userId !== userId) {
->>>>>>> 152559ad1a17d89b54484bdd3a76be7e3adb83c7:src/routes/survey.ts
-            res.status(403).json({ message: 'Not authorized to delete this survey' });
+            res.status(403).json({ message: 'Not authorized to delete this survey' })
+            return
         }
 
         await prisma.survey.delete({
             where: { id: surveyId }
-        });
+        })
 
-        res.json({ message: 'Survey deleted successfully' });
+        res.json({ message: 'Survey deleted successfully' })
     } catch (error) {
-        console.error('Error deleting survey:', error);
-        res.status(500).json({ message: 'Failed to delete survey' });
+        console.error('Error deleting survey:', error)
+        res.status(500).json({ message: 'Failed to delete survey' })
     }
-});
+})
 
-export default router;
+export default router
