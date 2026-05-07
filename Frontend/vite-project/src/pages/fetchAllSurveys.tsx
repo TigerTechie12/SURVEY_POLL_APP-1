@@ -69,6 +69,12 @@ export function RenderAllSurveys() {
       <div className="max-w-4xl mx-auto px-6 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm mb-2"
+            >
+              ← Back to Dashboard
+            </button>
             <h1 className="text-2xl font-bold text-gray-900">All Surveys</h1>
             <p className="text-gray-500 text-sm mt-1">
               {surveys.length} survey{surveys.length !== 1 ? 's' : ''} found

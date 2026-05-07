@@ -7,7 +7,7 @@ const router = Router()
 
 router.use(Verify)
 
-router.get('/surveys', async (req: Request, res: Response) => {
+router.get('/bulk', async (req: Request, res: Response) => {
     try {
         const surveys = await prisma.survey.findMany({
             include: {
@@ -32,7 +32,7 @@ router.get('/surveys', async (req: Request, res: Response) => {
     }
 })
 
-router.post('/surveys', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
     const { title, questions } = req.body
     const userId = (req as any).user.userId
 
@@ -47,7 +47,7 @@ router.post('/surveys', async (req: Request, res: Response) => {
                         title: q.title,
                         options: {
                             create: q.options.map((o: any) => ({
-                                text: o.text
+                                text: typeof o === 'string' ? o : o.text
                             }))
                         }
                     }))
@@ -68,7 +68,7 @@ router.post('/surveys', async (req: Request, res: Response) => {
     }
 })
 
-router.get('/surveys/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
     const surveyId = parseInt(req.params.id as string)
     try {
         const survey = await prisma.survey.findUnique({
@@ -101,7 +101,7 @@ router.get('/surveys/:id', async (req: Request, res: Response) => {
     }
 })
 
-router.put('/surveys/:id', async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
     const surveyId = parseInt(req.params.id as string)
     const { title, questions } = req.body
     const userId = (req as any).user.userId
@@ -156,7 +156,7 @@ router.put('/surveys/:id', async (req: Request, res: Response) => {
     }
 })
 
-router.delete('/surveys/:id', async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
     const surveyId = parseInt(req.params.id as string)
     const userId = (req as any).user.userId
 
