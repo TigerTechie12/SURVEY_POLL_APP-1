@@ -19,6 +19,7 @@ export function Auth({ type }: { type: "signup" | "signin" }) {
       const body = type === 'signup' ? { name, email, password } : { email, password }
       const res = await axios.post(`${BACKEND_URL}${endpoint}`, body)
       localStorage.setItem('token', res.data.token)
+      localStorage.setItem('userName', res.data.user?.name || res.data.user?.email || '')
       navigate('/')
     } catch (e: any) {
       setError(e?.response?.data?.message || 'Something went wrong')
