@@ -68,6 +68,23 @@ router.post('/', async (req: Request, res: Response) => {
     }
 })
 
+router.get('/search', async (req: Request, res: Response) => {
+    const { title } = req.query
+    try {
+        const surveys = await prisma.survey.findMany({
+            where: {
+                title: {
+                    contains: title as string,
+                    mode: 'insensitive'
+                }
+            }
+        })
+        res.json(surveys)
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to search surveys' })
+    }
+})
+
 router.get('/:id', async (req: Request, res: Response) => {
     const surveyId = parseInt(req.params.id as string)
     try {

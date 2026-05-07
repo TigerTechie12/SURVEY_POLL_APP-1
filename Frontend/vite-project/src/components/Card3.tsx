@@ -16,39 +16,47 @@ export function Card3() {
   const [result, setResult] = useState<Survey[]>([])
   const navigate = useNavigate()
 
-  async function EventOnPressingKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter' && query.trim() !== '') {
-      try {
-        const res = await axios.get<Survey[]>(`${BACKEND_URL}/surveys/search?title=${query}`)
-        setResult(res.data)
-      } catch (err) {
-        setResult([])
-      }
+  async function handleSearch(value: string) {
+    setQuery(value)
+    if (value.trim() === '') {
+      setResult([])
+      return
+    }
+    try {
+      const res = await axios.get<Survey[]>(`${BACKEND_URL}/survey/search?title=${value}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+      setResult(res.data)
+    } catch (err) {
+      setResult([])
     }
   }
 
   return (
-    <div>
+    <div className="relative">
       <input
         type="text"
-        onKeyDown={EventOnPressingKey}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
         value={query}
         className="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-        placeholder="Search surveys by title and press Enter..."
+        placeholder="Search surveys by title..."
       />
 
-      {result.length > 0 && (
-        <div className="mt-2 bg-white border border-gray-200 rounded-xl shadow-md overflow-hidden">
-          {result.map(survey => (
-            <div
-              key={survey.id}
-              className="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b last:border-0 text-sm text-gray-700 transition-colors"
-              onClick={() => navigate(`/surveys/${survey.id}`)}
-            >
-              {survey.title}
-            </div>
-          ))}
+      {query.trim() !== '' && (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+          {result.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-gray-400">No surveys found</div>
+          ) : (
+            result.map(survey => (
+              <div
+                key={survey.id}
+                className="px-4 py-3 hover:bg-indigo-50 cursor-pointer border-b last:border-0 text-sm text-gray-700 transition-colors"
+                onClick={() => { setQuery(''); setResult([]); navigate(`/surveys/${survey.id}`) }}
+              >
+                {survey.title}
+              </div>
+            ))
+          )}
         </div>
       )}
 
