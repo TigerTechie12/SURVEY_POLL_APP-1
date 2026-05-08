@@ -69,15 +69,39 @@ router.post('/', async (req: Request, res: Response) => {
 })
 
 router.post('/:id/vote', async (req: Request, res: Response) => {
-    const { optionId } = req.body
+    const surveyId = parseInt(req.params.id as string)
+    const { votes } = req.body
+    const userId = (req as any).user.userId
+
     try {
-        const option = await prisma.option.update({
-            where: { id: optionId },
-            data: { votes: { increment: 1 } }
+        const existingVote = await prisma.vote.findFirst({
+            where: { userId, surveyId }
         })
-        res.json({ message: 'Vote recorded', option })
+        if (existingVote) {
+            res.status(400).json({ message: 'You have already voted on this survey' })
+            return
+        }
+
+        const questionIds = Object.keys(votes).map(Number)
+        const optionIds = Object.values(votes) as number[]
+
+        await prisma.$transaction([
+            ...questionIds.map((questionId, i) =>
+                prisma.vote.create({
+                    data: { userId, surveyId, questionId, optionId: optionIds[i] }
+                })
+            ),
+            ...optionIds.map(optionId =>
+                prisma.option.update({
+                    where: { id: optionId },
+                    data: { votes: { increment: 1 } }
+                })
+            )
+        ])
+
+        res.json({ message: 'Votes recorded' })
     } catch (error) {
-        res.status(500).json({ message: 'Failed to record vote' })
+        res.status(500).json({ message: 'Failed to record votes' })
     }
 })
 
@@ -100,31 +124,37 @@ router.get('/search', async (req: Request, res: Response) => {
 
 router.get('/:id', async (req: Request, res: Response) => {
     const surveyId = parseInt(req.params.id as string)
+    const userId = (req as any).user.userId
+
     try {
-        const survey = await prisma.survey.findUnique({
-            where: { id: surveyId },
-            include: {
-                questions: {
-                    include: {
-                        options: true
-                    }
-                },
-                user: {
-                    select: {
-                        id: true,
-                        email: true,
-                        name: true
+        const [survey, userVotes] = await Promise.all([
+            prisma.survey.findUnique({
+                where: { id: surveyId },
+                include: {
+                    questions: {
+                        include: { options: true }
+                    },
+                    user: {
+                        select: { id: true, email: true, name: true }
                     }
                 }
-            }
-        })
+            }),
+            prisma.vote.findMany({
+                where: { surveyId, userId }
+            })
+        ])
 
         if (!survey) {
             res.status(404).json({ message: 'Survey not found' })
             return
         }
 
-        res.json({ survey })
+        const userVoteMap = userVotes.reduce((acc: Record<number, number>, v: { questionId: number, optionId: number }) => {
+            acc[v.questionId] = v.optionId
+            return acc
+        }, {})
+
+        res.json({ survey, userVotes: userVoteMap })
     } catch (error) {
         console.error('Error fetching survey:', error)
         res.status(500).json({ message: 'Failed to fetch survey' })

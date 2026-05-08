@@ -20,6 +20,7 @@ model User {
   password String
   name     String?
   surveys  Survey[]
+  votes    Vote[]
 }
 
 model Survey {
@@ -29,6 +30,7 @@ model Survey {
   userId    Int
   user      User       @relation(fields: [userId], references: [id])
   questions Question[]
+  votes     Vote[]
 }
 
 model Question {
@@ -37,12 +39,28 @@ model Question {
   surveyId  Int
   survey    Survey   @relation(fields: [surveyId], references: [id])
   options   Option[]
+  votes     Vote[]
 }
 
 model Option {
+  id          Int      @id @default(autoincrement())
+  text        String
+  votes       Int      @default(0)
+  questionId  Int
+  question    Question @relation(fields: [questionId], references: [id])
+  voteRecords Vote[]
+}
+
+model Vote {
   id         Int      @id @default(autoincrement())
-  text       String
-  votes      Int      @default(0)
+  userId     Int
+  surveyId   Int
   questionId Int
+  optionId   Int
+  user       User     @relation(fields: [userId], references: [id])
+  survey     Survey   @relation(fields: [surveyId], references: [id])
   question   Question @relation(fields: [questionId], references: [id])
+  option     Option   @relation(fields: [optionId], references: [id])
+
+  @@unique([userId, questionId])
 }
