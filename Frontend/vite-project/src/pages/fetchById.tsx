@@ -51,6 +51,18 @@ export function RenderSurvey() {
     fetchSurvey()
   }, [surveyId])
 
+  async function deleteSurvey() {
+    if (!window.confirm('Delete this survey? This cannot be undone.')) return
+    try {
+      await axios.delete(`${BACKEND_URL}/survey/surveys/${surveyId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
+      navigate('/surveys')
+    } catch {
+      setError('Failed to delete survey')
+    }
+  }
+
   async function submitVotes() {
     try {
       await Promise.all(
@@ -84,10 +96,30 @@ export function RenderSurvey() {
           <button onClick={() => navigate('/')} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 text-sm mb-3">
             ← Back to Dashboard
           </button>
-          <h1 className="text-2xl font-bold text-gray-900">{survey.title}</h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Created {new Date(survey.createdAt).toLocaleDateString()} · {isCreator ? 'Your survey' : 'Vote below'}
-          </p>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{survey.title}</h1>
+              <p className="text-sm text-gray-400 mt-1">
+                Created {new Date(survey.createdAt).toLocaleDateString()} · {isCreator ? 'Your survey' : 'Vote below'}
+              </p>
+            </div>
+            {isCreator && (
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => navigate(`/surveys/${surveyId}/edit`)}
+                  className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border border-indigo-200"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={deleteSurvey}
+                  className="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="space-y-6">

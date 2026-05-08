@@ -9,6 +9,7 @@ interface Survey {
   date: number
   id: string
   createdAt: string
+  userId: number
 }
 
 export function RenderAllSurveys() {
@@ -16,6 +17,7 @@ export function RenderAllSurveys() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
+  const currentUserId = parseInt(localStorage.getItem('userId') || '0')
 
   useEffect(() => {
     async function fetchSurveys() {
@@ -37,7 +39,7 @@ export function RenderAllSurveys() {
 
   async function deleteSurvey(surveyId: string) {
     try {
-      await axios.delete(`${BACKEND_URL}/survey/${surveyId}`, {
+      await axios.delete(`${BACKEND_URL}/survey/surveys/${surveyId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -109,12 +111,14 @@ export function RenderAllSurveys() {
                     <span>{survey.responses} responses</span>
                   </div>
                 </div>
-                <button
-                  onClick={e => { e.stopPropagation(); deleteSurvey(survey.id) }}
-                  className="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0"
-                >
-                  Delete
-                </button>
+                {survey.userId === currentUserId && (
+                  <button
+                    onClick={e => { e.stopPropagation(); deleteSurvey(survey.id) }}
+                    className="text-red-400 hover:text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors shrink-0"
+                  >
+                    Delete
+                  </button>
+                )}
               </div>
             ))}
           </div>
