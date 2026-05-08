@@ -18,6 +18,7 @@ export function Card1() {
     localStorage.removeItem('token')
     localStorage.removeItem('userName')
     localStorage.removeItem('userEmail')
+    localStorage.removeItem('userId')
     navigate('/signin')
   }
 

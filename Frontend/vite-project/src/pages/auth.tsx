@@ -21,6 +21,7 @@ export function Auth({ type }: { type: "signup" | "signin" }) {
       localStorage.setItem('token', res.data.token)
       localStorage.setItem('userName', res.data.user?.name || '')
       localStorage.setItem('userEmail', res.data.user?.email || '')
+      localStorage.setItem('userId', String(res.data.user?.id || ''))
       navigate('/')
     } catch (e: any) {
       setError(e?.response?.data?.message || 'Something went wrong')

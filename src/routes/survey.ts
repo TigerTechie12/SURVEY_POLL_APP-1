@@ -68,6 +68,19 @@ router.post('/', async (req: Request, res: Response) => {
     }
 })
 
+router.post('/:id/vote', async (req: Request, res: Response) => {
+    const { optionId } = req.body
+    try {
+        const option = await prisma.option.update({
+            where: { id: optionId },
+            data: { votes: { increment: 1 } }
+        })
+        res.json({ message: 'Vote recorded', option })
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to record vote' })
+    }
+})
+
 router.get('/search', async (req: Request, res: Response) => {
     const { title } = req.query
     try {
