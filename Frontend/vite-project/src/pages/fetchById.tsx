@@ -54,7 +54,7 @@ export function RenderSurvey() {
   async function deleteSurvey() {
     if (!window.confirm('Delete this survey? This cannot be undone.')) return
     try {
-      await axios.delete(`${BACKEND_URL}/survey/surveys/${surveyId}`, {
+      await axios.delete(`${BACKEND_URL}/survey/${surveyId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       navigate('/surveys')

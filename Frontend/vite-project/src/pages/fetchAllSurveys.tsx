@@ -39,7 +39,7 @@ export function RenderAllSurveys() {
 
   async function deleteSurvey(surveyId: string) {
     try {
-      await axios.delete(`${BACKEND_URL}/survey/surveys/${surveyId}`, {
+      await axios.delete(`${BACKEND_URL}/survey/${surveyId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

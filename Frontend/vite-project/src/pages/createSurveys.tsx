@@ -53,7 +53,7 @@ export function CreateSurveys() {
           title,
           questions: questions.map(q => ({
             title: q.questionText,
-            options: q.options
+            options: q.options.map(text => ({ text }))
           }))
         },
         {
