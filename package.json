@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "prisma generate && tsc && node -e \"require('fs').cpSync('generated','dist/generated',{recursive:true})\"",
     "start": "node dist/src/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
     "postinstall": "prisma generate"
