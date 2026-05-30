@@ -133,7 +133,7 @@ export function RenderSurvey() {
             const total = totalVotesForQuestion(q)
             const top = topOptionIds(q)
             const userPickId = userVotes[q.id]
-            const showResults = isCreator || hasVoted
+            const showResults = hasVoted
             return (
               <div key={q.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                 <p className="text-gray-900 font-medium mb-4">{q.title}</p>
@@ -184,7 +184,7 @@ export function RenderSurvey() {
           })}
         </div>
 
-        {!isCreator && !hasVoted && (
+        {!hasVoted && (
           <div className="mt-8 flex justify-end">
             <button
               onClick={submitVotes}
@@ -200,7 +200,7 @@ export function RenderSurvey() {
           <p className="mt-6 text-center text-sm text-green-600 font-medium">Your votes have been submitted!</p>
         )}
 
-        {!isCreator && !submitted && hasVoted && (
+        {!submitted && hasVoted && (
           <p className="mt-6 text-center text-sm text-gray-500">You've already voted on this survey. Your choices are highlighted above.</p>
         )}
       </div>
