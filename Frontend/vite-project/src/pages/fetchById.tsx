@@ -65,20 +65,16 @@ export function RenderSurvey() {
 
   async function submitVotes() {
     try {
-      await Promise.all(
-        Object.values(votes).map(optionId =>
-          axios.post(`${BACKEND_URL}/survey/${surveyId}/vote`, { optionId }, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
-        )
-      )
+      await axios.post(`${BACKEND_URL}/survey/${surveyId}/vote`, { votes }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      })
       setSubmitted(true)
       const res = await axios.get(`${BACKEND_URL}/survey/${surveyId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       setSurvey(res.data.survey)
-    } catch {
-      setError('Failed to submit votes')
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to submit votes')
     }
   }
 
