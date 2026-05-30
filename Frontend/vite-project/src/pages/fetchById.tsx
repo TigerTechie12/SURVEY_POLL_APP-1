@@ -29,6 +29,7 @@ export function RenderSurvey() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [votes, setVotes] = useState<Record<number, number>>({})
+  const [userVotes, setUserVotes] = useState<Record<number, number>>({})
   const [submitted, setSubmitted] = useState(false)
   const navigate = useNavigate()
 
@@ -42,6 +43,7 @@ export function RenderSurvey() {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
         setSurvey(res.data.survey)
+        setUserVotes(res.data.userVotes || {})
       } catch (err) {
         setError('Failed to load survey')
       } finally {
@@ -73,6 +75,7 @@ export function RenderSurvey() {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       })
       setSurvey(res.data.survey)
+      setUserVotes(res.data.userVotes || votes)
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to submit votes')
     }
@@ -83,7 +86,14 @@ export function RenderSurvey() {
   if (!survey) return <div className="min-h-screen bg-slate-50 flex items-center justify-center"><div className="text-gray-400 text-sm">Survey not found</div></div>
 
   const isCreator = currentUserId === survey.userId
+  const hasVoted = submitted || Object.keys(userVotes).length > 0
   const totalVotesForQuestion = (q: Question) => q.options.reduce((sum, o) => sum + o.votes, 0)
+  const topOptionIds = (q: Question) => {
+    const total = totalVotesForQuestion(q)
+    if (total === 0) return new Set<number>()
+    const max = Math.max(...q.options.map(o => o.votes))
+    return new Set(q.options.filter(o => o.votes === max).map(o => o.id))
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -119,49 +129,42 @@ export function RenderSurvey() {
         </div>
 
         <div className="space-y-6">
-          {survey.questions.map((q) => (
-            <div key={q.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
-              <p className="text-gray-900 font-medium mb-4">{q.title}</p>
+          {survey.questions.map((q) => {
+            const total = totalVotesForQuestion(q)
+            const top = topOptionIds(q)
+            const userPickId = userVotes[q.id]
+            const showResults = isCreator || hasVoted
+            return (
+              <div key={q.id} className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+                <p className="text-gray-900 font-medium mb-4">{q.title}</p>
 
-              {isCreator ? (
-                <div className="space-y-2">
-                  {q.options.map(o => {
-                    const total = totalVotesForQuestion(q)
-                    const pct = total > 0 ? Math.round((o.votes / total) * 100) : 0
-                    return (
-                      <div key={o.id}>
-                        <div className="flex justify-between text-sm mb-1">
-                          <span className="text-gray-700">{o.text}</span>
-                          <span className="text-gray-500 font-medium">{o.votes} votes ({pct}%)</span>
-                        </div>
-                        <div className="w-full bg-gray-100 rounded-full h-2">
-                          <div className="bg-indigo-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
-                        </div>
-                      </div>
-                    )
-                  })}
-                  <p className="text-xs text-gray-400 mt-2">Total: {totalVotesForQuestion(q)} votes</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {submitted ? (
-                    q.options.map(o => {
-                      const total = totalVotesForQuestion(q)
+                {showResults ? (
+                  <div className="space-y-2">
+                    {q.options.map(o => {
                       const pct = total > 0 ? Math.round((o.votes / total) * 100) : 0
+                      const isTop = top.has(o.id)
+                      const isUserPick = userPickId === o.id
                       return (
                         <div key={o.id}>
                           <div className="flex justify-between text-sm mb-1">
-                            <span className="text-gray-700">{o.text}</span>
-                            <span className="text-gray-500">{pct}%</span>
+                            <span className="text-gray-700 flex items-center gap-2">
+                              {o.text}
+                              {isUserPick && <span className="text-[10px] uppercase tracking-wide font-semibold text-indigo-700 bg-indigo-100 px-1.5 py-0.5 rounded">Your vote</span>}
+                              {isTop && <span className="text-[10px] uppercase tracking-wide font-semibold text-green-700 bg-green-100 px-1.5 py-0.5 rounded">Top choice</span>}
+                            </span>
+                            <span className="text-gray-500 font-medium">{isCreator ? `${o.votes} votes (${pct}%)` : `${pct}%`}</span>
                           </div>
                           <div className="w-full bg-gray-100 rounded-full h-2">
-                            <div className="bg-indigo-500 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                            <div className={`${isTop ? 'bg-green-500' : 'bg-indigo-500'} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       )
-                    })
-                  ) : (
-                    q.options.map(o => (
+                    })}
+                    {isCreator && <p className="text-xs text-gray-400 mt-2">Total: {total} votes</p>}
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {q.options.map(o => (
                       <label key={o.id} className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${votes[q.id] === o.id ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200 hover:bg-gray-50'}`}>
                         <input
                           type="radio"
@@ -173,15 +176,15 @@ export function RenderSurvey() {
                         />
                         <span className="text-sm text-gray-700">{o.text}</span>
                       </label>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
 
-        {!isCreator && !submitted && (
+        {!isCreator && !hasVoted && (
           <div className="mt-8 flex justify-end">
             <button
               onClick={submitVotes}
@@ -195,6 +198,10 @@ export function RenderSurvey() {
 
         {submitted && (
           <p className="mt-6 text-center text-sm text-green-600 font-medium">Your votes have been submitted!</p>
+        )}
+
+        {!isCreator && !submitted && hasVoted && (
+          <p className="mt-6 text-center text-sm text-gray-500">You've already voted on this survey. Your choices are highlighted above.</p>
         )}
       </div>
     </div>
